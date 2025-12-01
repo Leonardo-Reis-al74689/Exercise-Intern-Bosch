@@ -1,0 +1,54 @@
+<div class="login-container">
+  <div class="card login-card">
+    <h1>{{ messages.FORMS.TASK_MANAGER }}</h1>
+    <h2>{{ messages.FORMS.LOGIN }}</h2>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">Nome de Utilizador</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-control"
+          placeholder="Digite o seu nome de utilizador"
+        />
+        <div class="error-message" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+          {{ messages.VALIDATION.USERNAME_REQUIRED }} ({{ messages.VALIDATION.USERNAME_MIN_LENGTH }})
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Palavra-passe</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="Digite a sua palavra-passe"
+        />
+        <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          {{ messages.VALIDATION.PASSWORD_REQUIRED }} ({{ messages.VALIDATION.PASSWORD_MIN_LENGTH }})
+        </div>
+      </div>
+
+      <div class="alert alert-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="loginForm.invalid || isLoading"
+        style="width: 100%; margin-top: 10px;"
+      >
+        {{ isLoading ? messages.FORMS.LOGGING_IN : messages.FORMS.LOGIN }}
+      </button>
+    </form>
+
+    <p style="text-align: center; margin-top: 20px;">
+      {{ messages.FORMS.NO_ACCOUNT }} <a routerLink="/register" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">{{ messages.FORMS.REGISTER_LINK }}</a>
+    </p>
+  </div>
+</div>
+

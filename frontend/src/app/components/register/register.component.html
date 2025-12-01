@@ -1,0 +1,85 @@
+<div class="register-container">
+  <div class="card register-card">
+    <h1>{{ messages.FORMS.TASK_MANAGER }}</h1>
+    <h2>{{ messages.FORMS.REGISTER }}</h2>
+    
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">Nome de Utilizador</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-control"
+          placeholder="Digite o seu nome de utilizador"
+        />
+        <div class="error-message" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
+          {{ messages.VALIDATION.USERNAME_REQUIRED }} (3-80 caracteres)
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="Digite o seu email"
+        />
+        <div class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+          {{ messages.VALIDATION.EMAIL_INVALID }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Palavra-passe</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="Digite a sua palavra-passe"
+        />
+        <div class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+          {{ messages.VALIDATION.PASSWORD_REQUIRED }} ({{ messages.VALIDATION.PASSWORD_MIN_LENGTH }})
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Palavra-passe</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          class="form-control"
+          placeholder="Confirme a sua palavra-passe"
+        />
+        <div class="error-message" *ngIf="registerForm.get('confirmPassword')?.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched">
+          {{ messages.VALIDATION.PASSWORD_MISMATCH }}
+        </div>
+        <div class="error-message" *ngIf="registerForm.get('confirmPassword')?.hasError('required') && registerForm.get('confirmPassword')?.touched">
+          {{ messages.VALIDATION.FIELD_REQUIRED }}
+        </div>
+      </div>
+
+      <div class="alert alert-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="registerForm.invalid || isLoading"
+        style="width: 100%; margin-top: 10px;"
+      >
+        {{ isLoading ? 'A criar conta...' : messages.FORMS.REGISTER }}
+      </button>
+    </form>
+
+    <p style="text-align: center; margin-top: 20px;">
+      Já tem uma conta? <a routerLink="/login" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">{{ messages.FORMS.LOGIN }}</a>
+    </p>
+  </div>
+</div>
+
