@@ -1,0 +1,69 @@
+<div class="container">
+  <div class="card">
+    <h1>{{ isEditMode ? messages.FORMS.EDIT_TASK : messages.FORMS.CREATE_TASK }}</h1>
+    
+    <div class="loading" *ngIf="isLoading && isEditMode">
+      {{ messages.TASKS.LOADING_TASK }}
+    </div>
+
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading || !isEditMode">
+      <div class="form-group">
+        <label for="title">Título *</label>
+        <input
+          type="text"
+          id="title"
+          formControlName="title"
+          class="form-control"
+          placeholder="Digite o título da tarefa"
+        />
+        <div class="error-message" *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched">
+          {{ messages.VALIDATION.TITLE_REQUIRED }} ({{ messages.VALIDATION.TITLE_MAX_LENGTH }})
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Descrição</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          class="form-control"
+          rows="5"
+          placeholder="Digite a descrição da tarefa (opcional)"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label style="display: flex; align-items: center; cursor: pointer;">
+          <input
+            type="checkbox"
+            formControlName="completed"
+            style="width: auto; margin-right: 10px; cursor: pointer;"
+          />
+          <span>{{ messages.FORMS.TASK_COMPLETED }}</span>
+        </label>
+      </div>
+
+      <div class="alert alert-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancel()"
+        >
+          {{ messages.FORMS.CANCEL }}
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="taskForm.invalid || isLoading"
+        >
+          {{ isLoading ? messages.TASKS.SAVING : messages.FORMS.SAVE }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

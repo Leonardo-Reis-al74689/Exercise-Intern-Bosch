@@ -1,0 +1,88 @@
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>As Minhas Tarefas</h1>
+      <p *ngIf="currentUser">{{ messages.FORMS.WELCOME }}, {{ currentUser.username }}!</p>
+    </div>
+    <div class="header-actions">
+      <button class="theme-toggle" (click)="toggleTheme()" [title]="currentTheme === 'light' ? 'Modo escuro' : 'Modo claro'">
+        {{ currentTheme === 'light' ? '🌙' : '☀️' }}
+      </button>
+      <button class="btn btn-primary" routerLink="/tasks/new">
+        + {{ messages.FORMS.NEW_TASK }}
+      </button>
+      <button class="btn btn-secondary" (click)="logout()">
+        {{ messages.FORMS.LOGOUT }}
+      </button>
+    </div>
+  </div>
+
+  <div class="alert alert-error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    {{ messages.TASKS.LOADING }}
+  </div>
+
+  <div *ngIf="!isLoading && tasks.length === 0" class="empty-state">
+    <p>{{ messages.TASKS.NO_TASKS }}</p>
+    <button class="btn btn-primary" routerLink="/tasks/new">
+      {{ messages.FORMS.FIRST_TASK }}
+    </button>
+  </div>
+
+  <div class="tasks-grid" *ngIf="!isLoading && tasks.length > 0">
+    <div
+      *ngFor="let task of tasks"
+      class="task-card"
+      [class.completed]="task.completed"
+    >
+      <div class="task-header">
+        <h3>{{ task.title }}</h3>
+        <div class="task-actions">
+          <button
+            class="btn-icon"
+            [class.completed-icon]="task.completed"
+            (click)="toggleTaskComplete(task)"
+            [title]="task.completed ? 'Marcar como não concluída' : 'Marcar como concluída'"
+          >
+            {{ task.completed ? '✓' : '○' }}
+          </button>
+        </div>
+      </div>
+      
+      <div class="task-description-wrapper" *ngIf="task.description">
+        <p class="task-description">
+          {{ task.description }}
+        </p>
+        <button
+          *ngIf="shouldShowMoreButton(task.description)"
+          class="btn-link"
+          [routerLink]="['/tasks', task.id, 'edit']"
+        >
+          {{ messages.FORMS.SEE_MORE }}
+        </button>
+      </div>
+      
+      <div class="task-footer">
+        <span class="task-date">
+          {{ messages.FORMS.CREATED_AT }}: {{ task.created_at | date:'dd/MM/yyyy HH:mm' }}
+        </span>
+        <div class="task-buttons">
+          <button
+            class="btn btn-secondary"
+            [routerLink]="['/tasks', task.id, 'edit']"
+          >
+            {{ messages.FORMS.EDIT }}
+          </button>
+          <app-task-delete
+            [taskId]="task.id"
+            (taskDeleted)="onTaskDeleted()"
+          ></app-task-delete>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,29 @@
+<div class="delete-container">
+  <button
+    *ngIf="!showConfirm"
+    class="btn btn-danger"
+    (click)="onDelete()"
+    [disabled]="isDeleting"
+  >
+    {{ messages.FORMS.DELETE }}
+  </button>
+  
+  <div *ngIf="showConfirm" class="confirm-delete">
+    <span>{{ messages.TASKS.CONFIRM_DELETE }}</span>
+    <button
+      class="btn btn-danger"
+      (click)="confirmDelete()"
+      [disabled]="isDeleting"
+    >
+      {{ isDeleting ? messages.TASKS.DELETING : messages.FORMS.YES }}
+    </button>
+    <button
+      class="btn btn-secondary"
+      (click)="cancelDelete()"
+      [disabled]="isDeleting"
+    >
+      {{ messages.FORMS.NO }}
+    </button>
+  </div>
+</div>
+
