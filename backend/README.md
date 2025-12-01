@@ -5,9 +5,9 @@ Backend REST API desenvolvido em Flask para o sistema de gestão de tarefas.
 ## 🚀 Tecnologias
 
 - **Flask** - Framework web Python
-- **SQLAlchemy** - ORM para banco de dados
+- **SQLAlchemy** - ORM para base de dados
 - **Flask-JWT-Extended** - Autenticação JWT
-- **PostgreSQL** - Banco de dados relacional
+- **PostgreSQL** - Base de dados relacional
 - **Pydantic** - Validação de dados
 - **Passlib** - Hash de palavras-passe
 
@@ -27,7 +27,7 @@ pip install -r requirements.txt
 
 2. **Configurar variáveis de ambiente:**
 
-Crie um arquivo `.env` na raiz do backend com as seguintes variáveis:
+Crie um ficheiro `.env` na raiz do backend com as seguintes variáveis:
 
 ```
 DATABASE_URL=postgresql://postgres:password@localhost/taskmanager
@@ -36,7 +36,7 @@ JWT_SECRET_KEY=your-jwt-secret-key-change-this-in-production
 JWT_ACCESS_TOKEN_EXPIRES=30
 ```
 
-3. **Criar banco de dados:**
+3. **Criar base de dados:**
 
 ```bash
 createdb taskmanager
@@ -108,7 +108,7 @@ Criar nova tarefa
 **Body:**
 ```json
 {
-  "title": "Minha tarefa",
+  "title": "A minha tarefa",
   "description": "Descrição da tarefa",
   "completed": false
 }
@@ -136,7 +136,7 @@ Eliminar tarefa
 - **Autenticação JWT**: Tokens com expiração configurável
 - **Hash de Palavras-passe**: Bcrypt com salt automático
 - **Isolamento de Recursos**: Utilizadores só acedem às suas próprias tarefas
-- **Validação de Dados**: Pydantic + sanitização customizada
+- **Validação de Dados**: Pydantic + sanitização personalizada
 - **Headers de Segurança**: XSS, Clickjacking, MIME sniffing protection
 - **CORS Restritivo**: Apenas origens permitidas
 - **Rate Limiting**: Prevenção de abuso (opcional)
@@ -165,7 +165,7 @@ backend/
 │   │   ├── error_codes.py
 │   │   ├── http_status.py
 │   │   └── task_status.py
-│   ├── exceptions/          # Exceções customizadas
+│   ├── exceptions/          # Exceções personalizadas
 │   │   └── custom_exceptions.py
 │   ├── middleware/          # Middleware (segurança, erros)
 │   │   ├── error_handler.py
@@ -187,15 +187,15 @@ O código segue princípios de Programação Orientada a Objetos:
 
 - **Enums**: Constantes tipadas (`ErrorCode`, `HTTPStatus`, `TaskStatus`)
 - **Service Layer**: Lógica de negócio separada das rotas
-- **Custom Exceptions**: Hierarquia de exceções para tratamento padronizado
+- **Exceções Personalizadas**: Hierarquia de exceções para tratamento padronizado
 - **Classes Utilitárias**: Validação e sanitização encapsuladas
 - **Decorators**: Funcionalidades transversais reutilizáveis
 
 Veja `ARCHITECTURE.md` para detalhes completos sobre os padrões implementados.
 
-## 🧪 Testando a API
+## 🧪 Testar a API
 
-Você pode testar a API usando ferramentas como:
+Pode testar a API utilizando ferramentas como:
 - Postman
 - Insomnia
 - curl
