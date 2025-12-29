@@ -1,0 +1,120 @@
+# ==========================================
+# TASK MANAGER - AMBIENTE DE DESENVOLVIMENTO
+# ==========================================
+# Este ficheiro configura todos os serviços necessários para desenvolvimento local
+# Uso: docker-compose -f docker/docker-compose.yml up
+
+services:
+  # ==========================================
+  # BASE DE DADOS - PostgreSQL
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: taskmanager-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-taskmanager_dev}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # Volume persistente para os dados
+      - postgres_data:/var/lib/postgresql/data
+      # Script de inicialização (opcional)
+      - ../backend/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - taskmanager-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # BACKEND - Flask API
+  # ==========================================
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: taskmanager-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Flask
+      FLASK_ENV: development
+      FLASK_DEBUG: 1
+      
+      # Base de dados (usando nome do serviço como host)
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-taskmanager_dev}
+      
+      # Segurança (valores de desenvolvimento)
+      SECRET_KEY: dev-secret-key-not-for-production
+      JWT_SECRET_KEY: dev-jwt-secret-key-not-for-production
+      JWT_ACCESS_TOKEN_EXPIRES: 60
+      
+      # CORS
+      CORS_ORIGINS: http://localhost:4200,http://frontend:80
+      
+      # Rate limiting
+      RATELIMIT_ENABLED: false
+      
+      # Servidor
+      PORT: 5000
+    ports:
+      - "${BACKEND_PORT:-5000}:5000"
+    volumes:
+      # Hot reload - monta código local no container
+      - ../backend:/app
+      - /app/venv
+      - /app/__pycache__
+    networks:
+      - taskmanager-network
+    command: python main.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # FRONTEND - Angular + Nginx
+  # ==========================================
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: taskmanager-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-4200}:80"
+    networks:
+      - taskmanager-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+# ==========================================
+# VOLUMES PERSISTENTES
+# ==========================================
+volumes:
+  postgres_data:
+    driver: local
+    name: taskmanager_postgres_data
+
+# ==========================================
+# REDE INTERNA
+# ==========================================
+networks:
+  taskmanager-network:
+    driver: bridge
+    name: taskmanager_network
+

@@ -1,0 +1,53 @@
+# Ambientes virtuais Python
+venv/
+env/
+ENV/
+.venv/
+
+# Ficheiros Python compilados
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Diretórios de testes
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentação
+README.md
+*.md
+docs/
+
+# Logs
+*.log
+
+# Ficheiros de sistema
+.DS_Store
+Thumbs.db
+
+# Ficheiros temporários
+*.tmp
+*.bak
+*.backup
+

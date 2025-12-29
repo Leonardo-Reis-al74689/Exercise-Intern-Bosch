@@ -1,0 +1,102 @@
+# ==========================================
+# RENDER.COM - CONFIGURAÇÃO INFRASTRUCTURE AS CODE
+# ==========================================
+# Este ficheiro permite criar automaticamente os serviços no Render
+# Documentação: https://render.com/docs/infrastructure-as-code
+
+services:
+  # ==========================================
+  # WEB SERVICE - BACKEND FLASK
+  # ==========================================
+  - type: web
+    name: taskmanager-backend
+    env: python
+    region: lisbon  # Escolha a região mais próxima (oregon, frankfurt, singapore)
+    plan: free
+    branch: main
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: gunicorn --config gunicorn.conf.py main:app
+    healthCheckPath: /health
+    envVars:
+      # Flask
+      - key: FLASK_ENV
+        value: production
+      
+      # Segurança - DEFINIR MANUALMENTE na Dashboard do Render
+      # NÃO colocar valores reais aqui (usar dashboard)
+      - key: SECRET_KEY
+        generateValue: true  # Render gera automaticamente
+      
+      - key: JWT_SECRET_KEY
+        generateValue: true  # Render gera automaticamente
+      
+      - key: JWT_ACCESS_TOKEN_EXPIRES
+        value: 30
+      
+      # Base de dados - usar variável interna do Render
+      - key: DATABASE_URL
+        fromDatabase:
+          name: taskmanager-postgres
+          property: connectionString
+      
+      # CORS - ATUALIZAR após deploy do frontend
+      - key: CORS_ORIGINS
+        value: http://localhost:4200,https://seu-frontend.vercel.app
+      
+      # Rate limiting
+      - key: RATELIMIT_ENABLED
+        value: true
+      
+      - key: RATELIMIT_DEFAULT
+        value: 100 per hour
+      
+      # Gunicorn
+      - key: GUNICORN_WORKERS
+        value: 2
+      
+      - key: GUNICORN_THREADS
+        value: 2
+      
+      - key: LOG_LEVEL
+        value: info
+
+# ==========================================
+# POSTGRESQL DATABASE
+# ==========================================
+databases:
+  - name: taskmanager-postgres
+    databaseName: taskmanager
+    user: taskmanager_user
+    plan: free
+    region: lisbon  # Deve ser a mesma região do web service
+    ipAllowList: []  # Vazio = permite apenas serviços Render internos
+
+# ==========================================
+# NOTAS IMPORTANTES
+# ==========================================
+# 1. Este ficheiro cria automaticamente:
+#    - Web Service (Backend Flask)
+#    - PostgreSQL Database
+#
+# 2. Para usar:
+#    - Fazer push para GitHub
+#    - No Render, escolher "New" > "Infrastructure as Code"
+#    - Selecionar este ficheiro render.yaml
+#
+# 3. Variáveis sensíveis (SECRET_KEY, JWT_SECRET_KEY):
+#    - Usar generateValue: true OU
+#    - Definir manualmente na dashboard (mais seguro)
+#
+# 4. Após deploy:
+#    - Copiar URL do backend
+#    - Atualizar CORS_ORIGINS com URL do frontend
+#    - Atualizar environment.prod.ts no frontend
+#
+# 5. Plano Free:
+#    - 750 horas/mês
+#    - 512MB RAM
+#    - Sleep após 15min inatividade
+#    - PostgreSQL 1GB storage
+

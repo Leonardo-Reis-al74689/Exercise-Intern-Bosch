@@ -1,0 +1,147 @@
+name: Frontend Tests
+
+# Executar em:
+# - Push para main
+# - Pull requests para main
+# - Execução manual
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-tests.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+# Permissões necessárias
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test:
+    name: Testes Frontend Angular
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Checkout do código
+      - name: 📥 Checkout código
+        uses: actions/checkout@v4
+      
+      # 2. Setup Node.js
+      - name: 🟢 Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      # 3. Instalar dependências
+      - name: 📦 Instalar dependências
+        working-directory: ./frontend
+        run: |
+          npm ci --legacy-peer-deps
+      
+      # 4. Executar testes
+      - name: 🧪 Executar testes
+        working-directory: ./frontend
+        run: |
+          npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+      
+      # 5. Upload de cobertura (opcional)
+      - name: 📊 Upload coverage
+        uses: codecov/codecov-action@v4
+        if: success()
+        with:
+          directory: ./frontend/coverage
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
+        continue-on-error: true
+      
+      # 6. Comentar PR com resultados
+      - name: 💬 Comentar PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Testes do frontend passaram com sucesso!'
+            })
+        continue-on-error: true
+
+  build:
+    name: Build de Produção
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v4
+      
+      - name: 🟢 Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: 📦 Instalar dependências
+        working-directory: ./frontend
+        run: |
+          npm ci --legacy-peer-deps
+      
+      - name: 🏗️ Build de produção
+        working-directory: ./frontend
+        run: |
+          npm run build -- --configuration production
+      
+      - name: ✅ Verificar build
+        working-directory: ./frontend
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ Diretório dist não foi criado!"
+            exit 1
+          fi
+          echo "✅ Build de produção criado com sucesso!"
+      
+      # 7. Upload do build como artefacto (opcional)
+      - name: 📤 Upload build artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
+          retention-days: 7
+
+  lint:
+    name: Linting Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v4
+      
+      - name: 🟢 Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: 📦 Instalar dependências
+        working-directory: ./frontend
+        run: |
+          npm ci --legacy-peer-deps
+      
+      - name: 🔍 Executar linting (se configurado)
+        working-directory: ./frontend
+        run: |
+          # ESLint/TSLint se estiver configurado
+          echo "ℹ️ Linting não configurado ainda"
+        continue-on-error: true
+

@@ -1,0 +1,110 @@
+# ==========================================
+# TASK MANAGER - REFERÊNCIA DE PRODUÇÃO
+# ==========================================
+# ATENÇÃO: Este ficheiro é apenas REFERÊNCIA
+# Em produção, usamos Render/Vercel que gerenciam os containers
+# NÃO é necessário executar este ficheiro para o deploy
+
+services:
+  # ==========================================
+  # BASE DE DADOS - PostgreSQL
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: taskmanager-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - taskmanager-prod-network
+    # Em produção, não exponha a porta publicamente
+    # ports:
+    #   - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # BACKEND - Flask API com Gunicorn
+  # ==========================================
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: taskmanager-backend-prod
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Flask
+      FLASK_ENV: production
+      
+      # Base de dados
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      
+      # Segurança (DEVE ser definido via secrets)
+      SECRET_KEY: ${SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ACCESS_TOKEN_EXPIRES: 30
+      
+      # CORS (URL do frontend em produção)
+      CORS_ORIGINS: ${FRONTEND_URL}
+      
+      # Rate limiting
+      RATELIMIT_ENABLED: true
+      RATELIMIT_DEFAULT: 100 per hour
+      
+      # Gunicorn
+      GUNICORN_WORKERS: 2
+      GUNICORN_THREADS: 2
+      LOG_LEVEL: info
+    ports:
+      - "5000:5000"
+    networks:
+      - taskmanager-prod-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # FRONTEND - Angular + Nginx
+  # ==========================================
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        - API_URL=${BACKEND_URL}
+    container_name: taskmanager-frontend-prod
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - taskmanager-prod-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  postgres_prod_data:
+    driver: local
+
+networks:
+  taskmanager-prod-network:
+    driver: bridge
+

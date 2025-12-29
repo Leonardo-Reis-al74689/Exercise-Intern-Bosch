@@ -1,0 +1,240 @@
+# ==========================================
+# TASK MANAGER - GITIGNORE
+# ==========================================
+
+# ==========================================
+# BACKEND - PYTHON/FLASK
+# ==========================================
+
+# Ambientes virtuais Python
+backend/venv/
+backend/env/
+backend/ENV/
+backend/.venv/
+
+# Ficheiros Python compilados
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/*.so
+
+# Distribuição / packaging
+backend/.Python
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+
+# PyInstaller
+backend/*.manifest
+backend/*.spec
+
+# Unit test / coverage
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/.tox/
+backend/.nox/
+backend/coverage.xml
+backend/*.cover
+backend/.hypothesis/
+
+# Alembic
+backend/alembic/versions/*.pyc
+
+# ==========================================
+# FRONTEND - ANGULAR/NODE
+# ==========================================
+
+# Dependências
+frontend/node_modules/
+frontend/npm-debug.log
+frontend/yarn-error.log
+
+# Build Angular
+frontend/dist/
+frontend/.angular/
+frontend/.cache/
+
+# IDEs e editores
+frontend/.vscode/
+frontend/.idea/
+frontend/*.swp
+frontend/*.swo
+frontend/*~
+
+# Testes
+frontend/coverage/
+frontend/.nyc_output/
+
+# ==========================================
+# DOCKER
+# ==========================================
+
+# Ficheiros de ambiente Docker
+docker/.env
+docker/.env.local
+docker/.env.*.local
+
+# ==========================================
+# VARIÁVEIS DE AMBIENTE E SECRETS
+# ==========================================
+
+# IMPORTANTE: Nunca commitar secrets!
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+**/.env
+**/.env.local
+**/env.local
+
+# Secrets
+secrets/
+*.key
+*.pem
+*.crt
+*.cer
+
+# ==========================================
+# IDES E EDITORES
+# ==========================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ==========================================
+# SISTEMA OPERATIVO
+# ==========================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ==========================================
+# LOGS
+# ==========================================
+
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==========================================
+# BACKUPS E TEMPORÁRIOS
+# ==========================================
+
+*.bak
+*.backup
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Backups de BD
+*.sql
+*.sql.gz
+backup_*.sql
+
+# ==========================================
+# DOCKER VOLUMES
+# ==========================================
+
+# Dados persistentes (não commitar)
+postgres_data/
+*_data/
+
+# ==========================================
+# RELATÓRIOS E ARTEFACTOS
+# ==========================================
+
+# Relatórios de monitorização
+monitoring_report_*.json
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage/
+
+# Build artefacts
+*.pyc
+*.pyo
+dist/
+build/
+
+# ==========================================
+# FICHEIROS ESPECÍFICOS DO PROJETO
+# ==========================================
+
+# Não ignorar ficheiros de exemplo
+!env.example
+!docker/env.docker.example
+
+# Não ignorar configurações importantes
+!.gitignore
+!.dockerignore
+!docker-compose.yml
+!Dockerfile
+!vercel.json
+!netlify.toml
+!render.yaml
+
+# ==========================================
+# NOTAS
+# ==========================================
+# 1. Nunca commitar ficheiros .env com secrets
+# 2. Backups de BD devem estar em .gitignore
+# 3. node_modules nunca deve ser commitado
+# 4. Verificar sempre antes de commit: git status
+

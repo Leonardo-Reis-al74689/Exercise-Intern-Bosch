@@ -1,0 +1,144 @@
+# ==========================================
+# NETLIFY - CONFIGURAÇÃO DE DEPLOY
+# ==========================================
+# Alternativa ao Vercel para hospedar o frontend
+# Documentação: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # Comando de build
+  command = "npm install --legacy-peer-deps && npm run build -- --configuration production"
+  
+  # Diretório de output (ajustar se necessário)
+  publish = "dist/task-manager-frontend"
+  
+  # Diretório base
+  base = "/"
+
+[build.environment]
+  # Variáveis de ambiente do Node
+  NODE_ENV = "production"
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+# ==========================================
+# REDIRECTS E REWRITES
+# ==========================================
+# Necessário para Angular routing funcionar
+
+[[redirects]]
+  # Todas as rotas vão para index.html (SPA routing)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  # Health check endpoint
+  from = "/health"
+  to = "/index.html"
+  status = 200
+
+# ==========================================
+# HEADERS DE SEGURANÇA
+# ==========================================
+
+[[headers]]
+  # Aplicar a todas as páginas
+  for = "/*"
+  
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "no-referrer-when-downgrade"
+    # Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+
+[[headers]]
+  # Cache de assets estáticos (1 ano)
+  for = "/assets/*"
+  
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  # Cache de imagens
+  for = "/*.{jpg,jpeg,png,gif,ico,svg,webp}"
+  
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  # Cache de ficheiros JS/CSS
+  for = "/*.{js,css,woff,woff2,ttf,eot}"
+  
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  # Sem cache para index.html (sempre servir versão mais recente)
+  for = "/index.html"
+  
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# ==========================================
+# CONFIGURAÇÕES DE BUILD
+# ==========================================
+
+[build.processing]
+  # Minificação de CSS
+  css.bundle = true
+  css.minify = true
+  
+  # Minificação de JS
+  js.bundle = true
+  js.minify = true
+  
+  # Otimização de imagens
+  images.compress = true
+
+# ==========================================
+# PLUGINS (Opcionais)
+# ==========================================
+
+[[plugins]]
+  # Plugin de otimização de build
+  package = "@netlify/plugin-lighthouse"
+  
+  [plugins.inputs]
+    output_path = "lighthouse-report.html"
+
+# ==========================================
+# CONTEXTOS DE DEPLOY
+# ==========================================
+
+# Produção (branch main)
+[context.production]
+  command = "npm install --legacy-peer-deps && npm run build -- --configuration production"
+  
+  [context.production.environment]
+    NODE_ENV = "production"
+
+# Preview (branches de feature)
+[context.branch-deploy]
+  command = "npm install --legacy-peer-deps && npm run build -- --configuration production"
+
+# Deploy previews de Pull Requests
+[context.deploy-preview]
+  command = "npm install --legacy-peer-deps && npm run build -- --configuration production"
+
+# ==========================================
+# NOTAS
+# ==========================================
+# 1. Após deploy, copiar URL e atualizar:
+#    - CORS_ORIGINS no backend (Render)
+#    - Documentação do projeto
+#
+# 2. Netlify detecta Angular automaticamente
+#
+# 3. Para custom domain:
+#    - Dashboard Netlify > Domain Settings
+#    - Adicionar domínio (gratuito: .netlify.app)
+#
+# 4. SSL/HTTPS é automático e gratuito
+

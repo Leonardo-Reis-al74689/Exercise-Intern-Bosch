@@ -1,0 +1,54 @@
+# Dependências Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Diretórios de build
+dist/
+.angular/
+.cache/
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testes
+coverage/
+.nyc_output/
+*.spec.ts
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentação
+README.md
+*.md
+docs/
+
+# Ficheiros de configuração de desenvolvimento
+karma.conf.js
+tsconfig.spec.json
+e2e/
+
+# Logs
+*.log
+logs/
+
+# Ficheiros temporários
+*.tmp
+*.bak
+*.backup
+

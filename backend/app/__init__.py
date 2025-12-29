@@ -44,6 +44,25 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(tasks_bp, url_prefix='/api/tasks')
     
+    # Endpoint de health check para monitorização
+    @app.route('/health')
+    def health_check():
+        """Verifica se a aplicação e BD estão operacionais"""
+        try:
+            # Testa conexão à base de dados
+            db.session.execute(db.text('SELECT 1'))
+            return {
+                'status': 'healthy',
+                'database': 'connected',
+                'message': 'API operacional'
+            }, 200
+        except Exception as e:
+            return {
+                'status': 'unhealthy',
+                'database': 'disconnected',
+                'error': str(e)
+            }, 503
+    
     with app.app_context():
         db.create_all()
     

@@ -1,0 +1,138 @@
+name: Keep Render Alive
+
+# Executar a cada 14 minutos para evitar cold start
+# Render free tier: dorme após 15min de inatividade
+on:
+  schedule:
+    # Cron: a cada 14 minutos
+    # Formato: minute hour day month weekday
+    - cron: '*/14 * * * *'
+  
+  # Permitir execução manual
+  workflow_dispatch:
+
+# Permissões mínimas necessárias
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    name: Ping Backend
+    runs-on: ubuntu-latest
+    
+    # Timeout de 5 minutos (cold start pode demorar ~60s)
+    timeout-minutes: 5
+    
+    steps:
+      - name: 🔄 Ping ao backend
+        run: |
+          echo "🔄 A verificar backend..."
+          
+          # URL do backend (definir como secret no GitHub)
+          # Settings > Secrets and variables > Actions > New repository secret
+          # Nome: BACKEND_URL
+          # Valor: https://seu-backend.onrender.com
+          BACKEND_URL="${{ secrets.BACKEND_URL }}"
+          
+          # Verificar se a variável está definida
+          if [ -z "$BACKEND_URL" ]; then
+            echo "⚠️ BACKEND_URL não está definido nos secrets"
+            echo "ℹ️ Configure em: Settings > Secrets and variables > Actions"
+            exit 0
+          fi
+          
+          # Fazer request ao health check
+          HEALTH_URL="${BACKEND_URL}/health"
+          echo "📍 URL: $HEALTH_URL"
+          
+          # Request com timeout de 120s (para cold start)
+          response=$(curl -s -w "\n%{http_code}" --max-time 120 "$HEALTH_URL" || echo "ERROR")
+          
+          # Extrair status code
+          http_code=$(echo "$response" | tail -n 1)
+          body=$(echo "$response" | head -n -1)
+          
+          # Verificar resultado
+          if [ "$http_code" = "200" ]; then
+            echo "✅ Backend operacional!"
+            echo "📊 Resposta: $body"
+            exit 0
+          elif [ "$http_code" = "ERROR" ]; then
+            echo "⏱️ Timeout ou erro de conexão (normal se estiver a acordar)"
+            exit 0
+          else
+            echo "⚠️ Status code inesperado: $http_code"
+            echo "📄 Resposta: $body"
+            exit 0
+          fi
+      
+      - name: 📊 Estatísticas
+        if: always()
+        run: |
+          echo "⏰ Timestamp: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+          echo "🔄 Próximo ping em ~14 minutos"
+
+  # Job adicional para verificar se o serviço está consistentemente down
+  health-check:
+    name: Health Check Detalhado
+    runs-on: ubuntu-latest
+    needs: ping
+    if: always()
+    
+    steps:
+      - name: 🏥 Verificação de saúde
+        run: |
+          BACKEND_URL="${{ secrets.BACKEND_URL }}"
+          
+          if [ -z "$BACKEND_URL" ]; then
+            echo "ℹ️ Configure BACKEND_URL nos secrets do GitHub"
+            exit 0
+          fi
+          
+          echo "🔍 A verificar estado do serviço..."
+          
+          # Tentar 3 vezes com intervalo de 30s
+          for i in 1 2 3; do
+            echo "Tentativa $i/3..."
+            
+            response=$(curl -s -w "\n%{http_code}" --max-time 60 "${BACKEND_URL}/health" || echo "ERROR")
+            http_code=$(echo "$response" | tail -n 1)
+            
+            if [ "$http_code" = "200" ]; then
+              echo "✅ Serviço respondeu na tentativa $i"
+              exit 0
+            fi
+            
+            if [ $i -lt 3 ]; then
+              echo "⏳ A aguardar 30s antes da próxima tentativa..."
+              sleep 30
+            fi
+          done
+          
+          echo "⚠️ Serviço não respondeu após 3 tentativas"
+          echo "ℹ️ Isto é normal se o serviço estiver em cold start"
+
+# CONFIGURAÇÃO NECESSÁRIA:
+# ========================
+# 1. Ir para: Settings > Secrets and variables > Actions
+# 2. Criar novo secret:
+#    Nome: BACKEND_URL
+#    Valor: https://seu-backend.onrender.com (sem barra no final)
+#
+# 3. Este workflow executará automaticamente a cada 14 minutos
+#
+# 4. Para desativar temporariamente:
+#    - Ir para Actions > Keep Render Alive
+#    - Clicar nos ... > Disable workflow
+#
+# 5. Para testar manualmente:
+#    - Ir para Actions > Keep Render Alive
+#    - Clicar em "Run workflow"
+#
+# NOTAS:
+# ======
+# - GitHub Actions tem limite de 2000 minutos/mês no plano gratuito
+# - Este workflow usa ~5 minutos/dia = ~150 minutos/mês
+# - Bem dentro do limite gratuito
+# - O serviço Render acordará em 30-60 segundos no primeiro request
+
