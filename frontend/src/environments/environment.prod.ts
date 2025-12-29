@@ -8,8 +8,7 @@ export const environment = {
   production: true,
   
   // URL da API backend em produção
-  // Substituir após deploy do backend no Render
-  apiUrl: 'https://taskmanager-backend.onrender.com/api',
+  apiUrl: 'https://taskmanager-backend-tuyu.onrender.com',
   
   // Timeout para requests HTTP (em milissegundos)
   httpTimeout: 30000,
