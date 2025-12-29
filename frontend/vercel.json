@@ -1,3 +1,11 @@
 {
-  "buildCommand": "npm install --legacy-peer-deps && npm run build -- --configuration production"
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/task-manager",
+  "installCommand": "npm install --legacy-peer-deps",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
