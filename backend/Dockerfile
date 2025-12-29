@@ -49,6 +49,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Copiar código da aplicação
 COPY . .
 
+# Dar permissão de execução ao entrypoint
+RUN chmod +x /app/entrypoint.sh
+
 # Criar utilizador não-root para segurança
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
@@ -68,6 +71,6 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:5000/health || exit 1
 
-# Comando de inicialização usando Gunicorn
-CMD ["gunicorn", "--config", "gunicorn.conf.py", "main:app"]
+# Comando de inicialização usando entrypoint (inicializa DB + Gunicorn)
+CMD ["/app/entrypoint.sh"]
 
