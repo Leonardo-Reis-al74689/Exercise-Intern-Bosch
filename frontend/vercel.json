@@ -1,6 +1,3 @@
 {
-  "installCommand": "npm install --legacy-peer-deps",
-  "buildCommand": "npm run build -- --configuration production",
-  "framework": "angular",
-  "nodeVersion": "20"
+  "buildCommand": "npm install --legacy-peer-deps && npm run build -- --configuration production"
 }
