@@ -5,11 +5,11 @@
   
   "name": "taskmanager-frontend",
   
-  "buildCommand": "npm install --legacy-peer-deps && npm run build -- --configuration production",
+  "buildCommand": "npm run build",
   
-  "outputDirectory": "dist/task-manager-frontend",
+  "outputDirectory": "dist/task-manager",
   
-  "framework": "angular",
+  "framework": null,
   
   "installCommand": "npm install --legacy-peer-deps",
   

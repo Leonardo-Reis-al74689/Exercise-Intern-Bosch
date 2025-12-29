@@ -8,7 +8,8 @@ import { ValidationRules } from '../../core/enums/validation-rules.enum';
 @Component({
   selector: 'app-task-form',
   templateUrl: './task-form.component.html',
-  styleUrls: ['./task-form.component.css']
+  styleUrls: ['./task-form.component.css'],
+  standalone: false
 })
 export class TaskFormComponent implements OnInit {
   taskForm: FormGroup;

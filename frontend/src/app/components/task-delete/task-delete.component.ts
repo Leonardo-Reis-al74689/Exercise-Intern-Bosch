@@ -5,7 +5,8 @@ import { MessagesService } from '../../core/services/messages.service';
 @Component({
   selector: 'app-task-delete',
   templateUrl: './task-delete.component.html',
-  styleUrls: ['./task-delete.component.css']
+  styleUrls: ['./task-delete.component.css'],
+  standalone: false
 })
 export class TaskDeleteComponent {
   @Input() taskId!: number;
