@@ -52,9 +52,26 @@ def register_error_handlers(app):
     @app.errorhandler(Exception)
     def handle_generic_exception(e: Exception):
         """Handler para exceções genéricas não tratadas"""
-        return jsonify({
+        import traceback
+        import os
+        
+        # Log do erro completo no console
+        app.logger.error(f"Exceção não tratada: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        
+        # Em desenvolvimento, mostrar detalhes do erro
+        response_data = {
             'message': 'Erro interno do servidor',
             'error_code': ErrorCode.INTERNAL_SERVER_ERROR.value,
             'status_code': HTTPStatus.INTERNAL_SERVER_ERROR.value
-        }), HTTPStatus.INTERNAL_SERVER_ERROR.value
+        }
+        
+        # Adicionar detalhes em modo de desenvolvimento/debug
+        if os.getenv('FLASK_ENV') != 'production':
+            response_data['details'] = {
+                'error': str(e),
+                'type': type(e).__name__
+            }
+        
+        return jsonify(response_data), HTTPStatus.INTERNAL_SERVER_ERROR.value
 
