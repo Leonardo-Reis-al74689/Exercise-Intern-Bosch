@@ -22,8 +22,7 @@ COPY . .
 
 # Build de produção otimizado
 # --configuration production: ativa otimizações (minificação, tree-shaking, AOT)
-# --output-path dist: define pasta de saída
-RUN npm run build -- --configuration production --output-path=dist
+RUN npm run build -- --configuration production
 
 # ==========================================
 # STAGE 2: Runtime - Nginx para servir ficheiros
@@ -37,7 +36,8 @@ COPY nginx.conf /etc/nginx/nginx.conf
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copiar build da aplicação do stage anterior
-COPY --from=builder /app/dist /usr/share/nginx/html
+# O Angular compila para dist/task-manager (ver angular.json)
+COPY --from=builder /app/dist/task-manager /usr/share/nginx/html
 
 # Criar utilizador não-root para segurança
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
