@@ -312,7 +312,7 @@ export const environment = {
 
 **Leonardo Reis**
 
-- GitHub: [@leonardo](https://github.com/leonardo)
+- GitHub: [@Leonardo-Reis-al74689](https://github.com/leonardo)
 - Email: leonardomreis3@gmail.com
 
 
