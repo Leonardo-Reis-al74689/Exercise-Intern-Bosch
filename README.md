@@ -273,40 +273,7 @@ python scripts/keep_alive.py --url https://seu-backend.onrender.com
 
 📖 **Guia completo:** [docs/MONITORING.md](docs/MONITORING.md)
 
----
 
-## 🔧 Configuração
-
-### Variáveis de Ambiente (Backend)
-
-```bash
-# Segurança
-SECRET_KEY=          # Gerar com: python -c "import secrets; print(secrets.token_hex(32))"
-JWT_SECRET_KEY=      # Gerar com: python -c "import secrets; print(secrets.token_hex(32))"
-JWT_ACCESS_TOKEN_EXPIRES=30  # Minutos
-
-# Base de Dados
-DATABASE_URL=postgresql://user:pass@host:5432/db
-
-# CORS
-CORS_ORIGINS=http://localhost:4200,https://seu-frontend.vercel.app
-
-# Rate Limiting
-RATELIMIT_ENABLED=true
-RATELIMIT_DEFAULT=100 per hour
-```
-
-### Variáveis de Ambiente (Frontend)
-
-```typescript
-// src/environments/environment.prod.ts
-export const environment = {
-  production: true,
-  apiUrl: 'https://seu-backend.onrender.com/api'
-};
-```
-
----
 
 ## 👨‍💻 Autor
 
