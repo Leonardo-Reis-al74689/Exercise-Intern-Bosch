@@ -22,7 +22,8 @@ class TestTaskRoutes:
         assert response.status_code == 200
         json_data = response.get_json()
         assert 'tasks' in json_data
-        assert 'total' in json_data
+        assert 'pagination' in json_data
+        assert json_data['pagination']['total'] >= 1
         assert len(json_data['tasks']) >= 1
     
     def test_list_tasks_empty(self, client, auth_headers):
@@ -31,7 +32,8 @@ class TestTaskRoutes:
         
         assert response.status_code == 200
         json_data = response.get_json()
-        assert json_data['total'] == 0
+        assert 'pagination' in json_data
+        assert json_data['pagination']['total'] == 0
         assert len(json_data['tasks']) == 0
     
     def test_list_tasks_unauthorized(self, client):
@@ -110,12 +112,12 @@ class TestTaskRoutes:
         user2_data = {
             'username': 'user2',
             'email': 'user2@example.com',
-            'password': 'password123'
+            'password': 'Password123!'
         }
         client.post('/api/auth/register', json=user2_data)
         login_response = client.post('/api/auth/login', json={
             'username': 'user2',
-            'password': 'password123'
+            'password': 'Password123!'
         })
         token2 = login_response.get_json()['access_token']
         headers2 = {'Authorization': f'Bearer {token2}'}
@@ -193,12 +195,12 @@ class TestTaskRoutes:
         user2_data = {
             'username': 'user2',
             'email': 'user2@example.com',
-            'password': 'password123'
+            'password': 'Password123!'
         }
         client.post('/api/auth/register', json=user2_data)
         login_response = client.post('/api/auth/login', json={
             'username': 'user2',
-            'password': 'password123'
+            'password': 'Password123!'
         })
         token2 = login_response.get_json()['access_token']
         headers2 = {'Authorization': f'Bearer {token2}'}
