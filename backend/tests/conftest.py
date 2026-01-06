@@ -35,14 +35,14 @@ def auth_headers(client):
     user_data = {
         'username': 'testuser',
         'email': 'test@example.com',
-        'password': 'testpass123'
+        'password': 'TestPass123!'
     }
     
     client.post('/api/auth/register', json=user_data)
     
     response = client.post('/api/auth/login', json={
         'username': 'testuser',
-        'password': 'testpass123'
+        'password': 'TestPass123!'
     })
     
     token = response.get_json()['access_token']
@@ -56,7 +56,7 @@ def test_user(app):
         user = User(
             username='testuser',
             email='test@example.com',
-            hashed_password=get_password_hash('testpass123')
+            hashed_password=get_password_hash('TestPass123!')
         )
         db.session.add(user)
         db.session.commit()
@@ -85,7 +85,7 @@ def another_user(app):
         user = User(
             username='anotheruser',
             email='another@example.com',
-            hashed_password=get_password_hash('anotherpass123')
+            hashed_password=get_password_hash('AnotherPass123!')
         )
         db.session.add(user)
         db.session.commit()

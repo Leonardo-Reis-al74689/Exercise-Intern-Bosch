@@ -24,10 +24,13 @@ class TestTaskService:
             db.session.add_all([task1, task2])
             db.session.commit()
             
-            tasks = TaskService.get_user_tasks(test_user)
+            result = TaskService.get_user_tasks(test_user)
             
-            assert len(tasks) == 2
-            assert all(task.user_id == test_user.id for task in tasks)
+            assert isinstance(result, dict)
+            assert 'tasks' in result
+            assert 'pagination' in result or 'total' in result
+            assert len(result['tasks']) == 2
+            assert all(task.user_id == test_user.id for task in result['tasks'])
     
     def test_get_task_by_id_success(self, app, test_user, test_task):
         """Testa obtenção de tarefa específica"""

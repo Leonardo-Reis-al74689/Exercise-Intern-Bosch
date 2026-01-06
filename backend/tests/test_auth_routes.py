@@ -12,7 +12,7 @@ class TestAuthRoutes:
         data = {
             'username': 'newuser',
             'email': 'newuser@example.com',
-            'password': 'password123'
+            'password': 'Password123!'
         }
         
         response = client.post('/api/auth/register', json=data)
@@ -29,7 +29,7 @@ class TestAuthRoutes:
         data = {
             'username': 'testuser',
             'email': 'test@example.com',
-            'password': 'password123'
+            'password': 'Password123!'
         }
         
         client.post('/api/auth/register', json=data)
@@ -79,13 +79,13 @@ class TestAuthRoutes:
         user_data = {
             'username': 'testuser',
             'email': 'test@example.com',
-            'password': 'testpass123'
+            'password': 'TestPass123!'
         }
         client.post('/api/auth/register', json=user_data)
         
         login_data = {
             'username': 'testuser',
-            'password': 'testpass123'
+            'password': 'TestPass123!'
         }
         
         response = client.post('/api/auth/login', json=login_data)

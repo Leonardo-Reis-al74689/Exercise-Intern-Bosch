@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict
 
 class LoginAttemptTracker:
@@ -8,7 +8,7 @@ class LoginAttemptTracker:
     
     def is_blocked(self, username: str) -> bool:
         if username in self._blocked:
-            if datetime.utcnow() < self._blocked[username]:
+            if datetime.now(timezone.utc) < self._blocked[username]:
                 return True
             else:
                 del self._blocked[username]
@@ -17,7 +17,7 @@ class LoginAttemptTracker:
         return False
     
     def record_failed_attempt(self, username: str) -> None:
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         if username not in self._attempts:
             self._attempts[username] = []
@@ -42,7 +42,7 @@ class LoginAttemptTracker:
         if username not in self._attempts:
             return 5
         
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         recent_attempts = [
             attempt for attempt in self._attempts[username]
             if now - attempt < timedelta(minutes=15)
@@ -52,7 +52,7 @@ class LoginAttemptTracker:
     
     def get_block_time_remaining(self, username: str) -> int:
         if username in self._blocked:
-            remaining = (self._blocked[username] - datetime.utcnow()).total_seconds()
+            remaining = (self._blocked[username] - datetime.now(timezone.utc)).total_seconds()
             return max(0, int(remaining / 60))
         return 0
 

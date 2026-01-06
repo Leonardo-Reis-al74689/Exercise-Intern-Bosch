@@ -23,7 +23,7 @@ class TestAuthService:
             user_data = UserCreate(
                 username='newuser',
                 email='newuser@example.com',
-                password='password123'
+                password='Password123!'
             )
             
             result = AuthService.register_user(user_data)
@@ -42,7 +42,7 @@ class TestAuthService:
             user_data = UserCreate(
                 username='testuser',
                 email='different@example.com',
-                password='password123'
+                password='Password123!'
             )
             
             with pytest.raises(ResourceAlreadyExistsException) as exc_info:
@@ -56,7 +56,7 @@ class TestAuthService:
             user_data = UserCreate(
                 username='differentuser',
                 email='test@example.com',
-                password='password123'
+                password='Password123!'
             )
             
             with pytest.raises(ResourceAlreadyExistsException) as exc_info:
@@ -69,7 +69,7 @@ class TestAuthService:
         with app.app_context():
             login_data = UserLogin(
                 username='testuser',
-                password='testpass123'
+                password='TestPass123!'
             )
             
             result = AuthService.authenticate_user(login_data)
@@ -128,7 +128,7 @@ class TestAuthService:
             user_data = UserCreate(
                 username='newuser',
                 email='newuser@example.com',
-                password='password123'
+                password='Password123!'
             )
             
             with patch('app.db.session.commit', side_effect=Exception("DB Error")):
