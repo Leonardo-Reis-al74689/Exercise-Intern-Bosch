@@ -42,7 +42,11 @@
           placeholder="Digite a sua palavra-passe"
         />
         <div class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
-          {{ messages.VALIDATION.PASSWORD_REQUIRED }} ({{ messages.VALIDATION.PASSWORD_MIN_LENGTH }})
+          <span *ngIf="registerForm.get('password')?.hasError('required')">{{ messages.VALIDATION.PASSWORD_REQUIRED }}</span>
+          <span *ngIf="registerForm.get('password')?.hasError('minlength')">A password deve ter no mínimo 8 caracteres</span>
+          <span *ngIf="registerForm.get('password')?.hasError('pattern')">
+            A password deve conter: 1 maiúscula, 1 minúscula, 1 número e 1 símbolo especial
+          </span>
         </div>
       </div>
 
@@ -65,6 +69,11 @@
 
       <div class="alert alert-error" *ngIf="errorMessage">
         {{ errorMessage }}
+      </div>
+
+      <div class="alert alert-info" *ngIf="showColdStartMessage" style="background-color: #e3f2fd; border-color: #2196f3; color: #1976d2;">
+        <strong>⏳ Aguarde um momento...</strong><br>
+        O servidor está a iniciar (plano gratuito). Isto pode demorar 30-60 segundos na primeira vez. Após isso, funcionará normalmente.
       </div>
 
       <button

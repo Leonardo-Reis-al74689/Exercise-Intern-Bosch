@@ -1,13 +1,9 @@
-"""Middleware para adicionar headers de segurança"""
 from flask import request, jsonify
 from functools import wraps
 
 def setup_security_headers(app):
-    """Configura headers de segurança nas respostas"""
-    
     @app.after_request
     def add_security_headers(response):
-        """Adiciona headers de segurança em todas as respostas"""
         response.headers['X-Frame-Options'] = 'DENY'
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-XSS-Protection'] = '1; mode=block'
@@ -16,7 +12,6 @@ def setup_security_headers(app):
         return response
 
 def validate_json_content_type(f):
-    """Decorator para validar Content-Type JSON"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if request.method in ['POST', 'PUT', 'PATCH']:

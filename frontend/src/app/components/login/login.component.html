@@ -36,6 +36,11 @@
         {{ errorMessage }}
       </div>
 
+      <div class="alert alert-info" *ngIf="showColdStartMessage" style="background-color: #e3f2fd; border-color: #2196f3; color: #1976d2;">
+        <strong>⏳ Aguarde um momento...</strong><br>
+        O servidor está a iniciar (plano gratuito). Isto pode demorar 30-60 segundos na primeira vez. Após isso, funcionará normalmente.
+      </div>
+
       <button
         type="submit"
         class="btn btn-primary"

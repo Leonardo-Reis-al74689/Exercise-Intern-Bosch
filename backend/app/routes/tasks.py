@@ -11,14 +11,26 @@ tasks_bp = Blueprint('tasks', __name__)
 @tasks_bp.route('', methods=['GET'])
 @require_auth
 def list_tasks(current_user):
-    """Rota privada para listar tarefas do utilizador atual"""
     try:
-        tasks = TaskService.get_user_tasks(current_user)
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        status_filter = request.args.get('status', None)
+        
+        per_page = min(per_page, 100)
+        
+        result = TaskService.get_user_tasks(current_user, page, per_page, status_filter)
         
         return jsonify({
             'message': 'Tarefas listadas com sucesso',
-            'tasks': [task.to_dict() for task in tasks],
-            'total': len(tasks)
+            'tasks': [task.to_dict() for task in result['tasks']],
+            'pagination': {
+                'total': result['total'],
+                'page': result['page'],
+                'per_page': result['per_page'],
+                'pages': result['pages'],
+                'has_next': result['has_next'],
+                'has_prev': result['has_prev']
+            }
         }), HTTPStatus.OK.value
     except Exception as e:
         raise
@@ -27,7 +39,6 @@ def list_tasks(current_user):
 @require_auth
 @validate_json_content_type
 def create_task(current_user):
-    """Rota privada para criar nova tarefa"""
     try:
         data = request.get_json()
         task_data = TaskCreate(**data)
@@ -47,7 +58,6 @@ def create_task(current_user):
 @tasks_bp.route('/<int:task_id>', methods=['GET'])
 @require_auth
 def get_task(current_user, task_id):
-    """Rota privada para obter uma tarefa específica"""
     try:
         task = TaskService.get_task_by_id(task_id, current_user)
         
@@ -62,7 +72,6 @@ def get_task(current_user, task_id):
 @require_auth
 @validate_json_content_type
 def update_task(current_user, task_id):
-    """Rota privada para atualizar uma tarefa"""
     try:
         data = request.get_json()
         task_data = TaskUpdate(**data)
@@ -82,7 +91,6 @@ def update_task(current_user, task_id):
 @tasks_bp.route('/<int:task_id>', methods=['DELETE'])
 @require_auth
 def delete_task(current_user, task_id):
-    """Rota privada para eliminar uma tarefa"""
     try:
         TaskService.delete_task(task_id, current_user)
         

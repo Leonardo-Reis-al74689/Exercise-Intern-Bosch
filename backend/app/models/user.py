@@ -2,7 +2,6 @@ from app import db
 from datetime import datetime
 
 class User(db.Model):
-    """Modelo de utilizador"""
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -17,7 +16,6 @@ class User(db.Model):
         return f'<User {self.username}>'
     
     def to_dict(self):
-        """Converter utilizador para dicionário"""
         return {
             'id': self.id,
             'username': self.username,

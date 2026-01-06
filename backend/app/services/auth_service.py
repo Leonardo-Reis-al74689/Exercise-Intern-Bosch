@@ -1,8 +1,8 @@
-"""Serviço de autenticação - Service Layer Pattern"""
 from app import db
 from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin
 from app.utils.security import verify_password, get_password_hash
+from app.utils.login_attempts import login_tracker
 from app.exceptions.custom_exceptions import (
     AuthenticationException,
     ResourceAlreadyExistsException,
@@ -61,25 +61,31 @@ class AuthService:
     
     @staticmethod
     def authenticate_user(login_data: UserLogin) -> dict:
-        """
-        Autentica um utilizador e retorna token JWT
+        if login_tracker.is_blocked(login_data.username):
+            block_time = login_tracker.get_block_time_remaining(login_data.username)
+            raise AuthenticationException(
+                message=f"Conta bloqueada temporariamente. Tente novamente em {block_time} minutos",
+                details={"username": login_data.username, "blocked_minutes": block_time}
+            )
         
-        Args:
-            login_data: Dados de início de sessão (username e password)
-            
-        Returns:
-            dict: Token JWT e dados do utilizador
-            
-        Raises:
-            AuthenticationException: Se credenciais forem inválidas
-        """
         user = User.query.filter_by(username=login_data.username).first()
         
         if not user or not verify_password(login_data.password, user.hashed_password):
-            raise AuthenticationException(
-                message="Credenciais inválidas",
-                details={"username": login_data.username}
-            )
+            login_tracker.record_failed_attempt(login_data.username)
+            remaining = login_tracker.get_remaining_attempts(login_data.username)
+            
+            if remaining > 0:
+                raise AuthenticationException(
+                    message=f"Credenciais inválidas. Tentativas restantes: {remaining}",
+                    details={"username": login_data.username, "remaining_attempts": remaining}
+                )
+            else:
+                raise AuthenticationException(
+                    message="Demasiadas tentativas falhadas. Conta bloqueada por 15 minutos",
+                    details={"username": login_data.username}
+                )
+        
+        login_tracker.record_successful_login(login_data.username)
         
         access_token = create_access_token(identity=user.id)
         

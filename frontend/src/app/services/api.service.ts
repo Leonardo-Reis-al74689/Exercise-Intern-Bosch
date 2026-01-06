@@ -6,9 +6,6 @@ import { environment } from '../../environments/environment';
 import { StorageKeys } from '../core/constants/storage-keys.constant';
 import { MessagesService } from '../core/services/messages.service';
 
-/**
- * Serviço base para comunicação com a API
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -20,9 +17,6 @@ export class ApiService {
     private messagesService: MessagesService
   ) {}
 
-  /**
-   * Obtém os headers HTTP com autenticação
-   */
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem(StorageKeys.ACCESS_TOKEN);
     let headers = new HttpHeaders({
@@ -36,9 +30,6 @@ export class ApiService {
     return headers;
   }
 
-  /**
-   * Trata erros HTTP e retorna mensagens apropriadas
-   */
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = this.messagesService.ERRORS.UNKNOWN;
     

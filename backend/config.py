@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    """Configuração base da aplicação"""
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql://postgres:password@localhost/taskmanager')
     SQLALCHEMY_TRACK_MODIFICATIONS = False

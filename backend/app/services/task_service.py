@@ -1,5 +1,4 @@
-"""Serviço de tarefas - Service Layer Pattern"""
-from typing import List, Optional
+from typing import List, Optional, Dict
 from app import db
 from app.models.task import Task
 from app.models.user import User
@@ -14,17 +13,34 @@ class TaskService:
     """Classe de serviço para operações com tarefas"""
     
     @staticmethod
-    def get_user_tasks(user: User) -> List[Task]:
-        """
-        Lista todas as tarefas de um utilizador
+    def get_user_tasks(
+        user: User, 
+        page: int = 1, 
+        per_page: int = 20,
+        status_filter: Optional[str] = None
+    ) -> Dict:
+        query = Task.query.filter_by(user_id=user.id)
         
-        Args:
-            user: Utilizador autenticado
-            
-        Returns:
-            List[Task]: Lista de tarefas do utilizador
-        """
-        return Task.query.filter_by(user_id=user.id).order_by(Task.created_at.desc()).all()
+        if status_filter == 'completed':
+            query = query.filter_by(completed=True)
+        elif status_filter == 'pending':
+            query = query.filter_by(completed=False)
+        
+        pagination = query.order_by(Task.created_at.desc()).paginate(
+            page=page, 
+            per_page=per_page, 
+            error_out=False
+        )
+        
+        return {
+            'tasks': pagination.items,
+            'total': pagination.total,
+            'page': pagination.page,
+            'per_page': pagination.per_page,
+            'pages': pagination.pages,
+            'has_next': pagination.has_next,
+            'has_prev': pagination.has_prev
+        }
     
     @staticmethod
     def get_task_by_id(task_id: int, user: User) -> Task:

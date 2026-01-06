@@ -1,8 +1,8 @@
 from app import db
 from datetime import datetime
+from sqlalchemy import Index
 
 class Task(db.Model):
-    """Modelo de tarefa"""
     __tablename__ = 'tasks'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -14,11 +14,15 @@ class Task(db.Model):
     
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
     
+    __table_args__ = (
+        Index('idx_user_completed_created', 'user_id', 'completed', 'created_at'),
+        Index('idx_user_created', 'user_id', 'created_at'),
+    )
+    
     def __repr__(self):
         return f'<Task {self.title}>'
     
     def to_dict(self):
-        """Converter tarefa para dicionário"""
         return {
             'id': self.id,
             'title': self.title,
