@@ -10,14 +10,13 @@ services:
   # ==========================================
   - type: web
     name: taskmanager-backend
-    env: python
+    runtime: python
     region: frankfurt  # Escolha a região mais próxima (oregon, frankfurt, singapore)
     plan: free
     branch: main
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
-      python scripts/init_db.py
     startCommand: gunicorn --config gunicorn.conf.py main:app
     healthCheckPath: /health
     envVars:
@@ -48,7 +47,7 @@ services:
       
       # Rate limiting
       - key: RATELIMIT_ENABLED
-        value: true
+        value: "true"
       
       - key: RATELIMIT_DEFAULT
         value: 100 per hour

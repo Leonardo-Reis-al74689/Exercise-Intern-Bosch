@@ -54,6 +54,7 @@ def create_app(config_class=Config):
                 'message': 'API operacional'
             }, 200
         except Exception as e:
+            app.logger.error(f"Health check failed: {str(e)}")
             return {
                 'status': 'unhealthy',
                 'database': 'disconnected',
@@ -61,7 +62,14 @@ def create_app(config_class=Config):
             }, 503
     
     with app.app_context():
-        db.create_all()
+        try:
+            app.logger.info("🔧 Verificando/Inicializando banco de dados...")
+            db.create_all()
+            app.logger.info("✅ Banco de dados inicializado com sucesso!")
+        except Exception as e:
+            app.logger.error(f"❌ Erro ao inicializar banco de dados: {str(e)}")
+            app.logger.error(f"DATABASE_URL configurada: {app.config.get('SQLALCHEMY_DATABASE_URI', 'NOT SET')[:50]}...")
+            raise
     
     return app
 
